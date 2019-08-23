@@ -17,5 +17,23 @@
   "bugs": {
     "url": "https://github.com/d-ost/dost-native/issues"
   },
-  "homepage": "https://github.com/d-ost/dost-native#readme"
+  "homepage": "https://github.com/d-ost/dost-native#readme",
+  "dependencies": {
+    "assert": "^2.0.0",
+    "bn.js": "^5.0.0",
+    "eslint": "^6.2.1",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.18.2",
+    "ethereumjs-util": "^6.1.0",
+    "ethlint": "^1.2.4",
+    "ganache": "^6.4.4",
+    "ganache-cli": "^6.6.0",
+    "ipfs": "^0.37.1",
+    "openzeppelin-solidity": "^2.3.0",
+    "solc": "^0.5.11",
+    "solium": "^1.2.4",
+    "sss-wasm": "^0.1.0",
+    "truffle": "^5.0.33",
+    "web3": "^1.2.1"
+  }
 }
