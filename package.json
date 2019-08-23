@@ -1,0 +1,21 @@
+{
+  "name": "dost-native",
+  "version": "0.1.0",
+  "description": "dOST native application",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/d-ost/dost-native.git"
+  },
+  "keywords": [
+    "ost"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/d-ost/dost-native/issues"
+  },
+  "homepage": "https://github.com/d-ost/dost-native#readme"
+}
