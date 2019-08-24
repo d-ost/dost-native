@@ -15,7 +15,7 @@ class RecoverWallet extends Component {
     }
 
     render (){
-        return <WalletInputs/>
+        return <WalletInputs searchUser={true}/>
     }
 
 }

@@ -42,7 +42,7 @@ class Landing extends Component {
         return (
             <View style={{flex:1}}>
                 <Text style={{marginTop: 100, textAlign: "center" , fontSize: 30}}>Wellcome to Dost</Text>
-                <View style={{marginTop: 50,  paddingHorizontal: 50 , flex:0.98}} >
+                <View style={{marginTop: 50,  paddingHorizontal: 30 , flex:0.98}} >
                     <TouchableButton
                         TouchableStyles={[Theme.Button.btnPink]}
                         TextStyles={[Theme.Button.btnPinkText]}
