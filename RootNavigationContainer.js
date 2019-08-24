@@ -8,6 +8,7 @@ import {
   createAppContainer
 } from 'react-navigation';
 
+import Loading from "./src/Loading";
 import Landing from "./src/Landing"; 
 import CreateWallet from "./src/CreateWallet"; 
 import RecoverWallet from "./src/RecoverWallet";
@@ -16,6 +17,7 @@ import Colors from './src/theme/styles/Colors';
 
 const WalletStack = createStackNavigator(
   {
+    Landing: Landing,
     CreateWallet: CreateWallet,
     RecoverWallet: RecoverWallet
   },
@@ -38,11 +40,11 @@ const WalletStack = createStackNavigator(
 const AppContainer = createAppContainer(
   createSwitchNavigator(
     {
-      Landing,
+      Loading, 
       WalletStack
     },
     {
-      initialRouteName: 'Landing'
+      initialRouteName: 'Loading'
     }
   )
 );
