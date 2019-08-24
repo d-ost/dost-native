@@ -1,6 +1,7 @@
-const web3utils = require('web3-utils');
-const Scrypt = require('scrypt');
+const assert = require('assert');
 const crypto = require('crypto');
+const Scrypt = require('scrypt');
+const web3utils = require('web3-utils');
 
 class Key {
   constructor(userAddress, pin) {
@@ -22,7 +23,6 @@ class Key {
     assert(typeof this.salt === 'string');
     assert(this.salt !== '');
 
-
     this.encryptionKeySeed = Key.calculateEncryptionKeySeed(this.userSecret, this.salt);
     assert(typeof this.encryptionKeySeed === 'string');
     assert(this.encryptionKeySeed !== '');
@@ -32,25 +32,37 @@ class Key {
         modulusLength: 4096,
         publicKeyEncoding: {
           type: 'spki',
+          format: 'pem',
         },
         privateKeyEncoding: {
           type: 'pkcs8',
           cipher: 'aes-256-cbc',
+          format: 'pem',
           passphrase: this.pin,
         },
       },
     );
+
+    assert(typeof keys.publicKey === 'string');
+    assert(keys.publicKey !== '');
     this.publicKey = keys.publicKey;
+
+    assert(typeof keys.privateKey === 'string');
+    assert(keys.privateKey !== '');
     this.privateKey = keys.privateKey;
   }
 
   pem() {
-    return this.privateKey.export({
-      format: 'pem',
-    });
+    assert(typeof this.privateKey === 'string');
+    assert(this.privateKey !== '');
+
+    return this.privateKey;
   }
 
   pemPass() {
+    assert(typeof this.pin === 'string');
+    assert(this.pin !== '');
+
     return this.pin;
   }
 
@@ -73,8 +85,8 @@ class Key {
     assert(typeof userAddress === 'string');
     assert(userAddress !== '');
 
-    assert(typeof pin === 'string')
-      .assert(pin !== '');
+    assert(typeof pin === 'string');
+    assert(pin !== '');
 
     return web3utils.sha3(
       JSON.stringify({
@@ -95,7 +107,7 @@ class Key {
     assert(typeof salt === 'string');
     assert(salt !== '');
 
-    return Scrypt.hash(this.userSecret, { N: 16384, r: 8, p: 1 }, 64, salt).toString();
+    return Scrypt.hashSync(userSecret, { N: 16384, r: 8, p: 1 }, 64, salt).toString();
   }
 }
 
