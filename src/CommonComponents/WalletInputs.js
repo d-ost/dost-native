@@ -2,6 +2,7 @@ import React , {Component} from 'react';
 import { View , Text , TextInput } from 'react-native';
 
 import TouchableButton from '../theme/components/TouchableButton';
+import SmoothPinCodeInput from 'react-native-smooth-pincode-input';
 
 import Theme from '../theme/styles';
 import { withNavigation } from 'react-navigation';
@@ -13,7 +14,7 @@ class WalletInputs extends Component {
 
         this.state = {
             username : null, 
-            pin: null, 
+            pin: '', 
             publicAddress: null,
 
             usernameError: false , 
@@ -23,15 +24,15 @@ class WalletInputs extends Component {
     }
 
     onUserNameChange = (val) => {
-        this.state.username = val ; 
+        this.setState({username: val});
     }
 
     onPin = (val) => {
-        this.state.pin = val ; 
+       this.setState({pin: val});
     }
 
     onPublicAddress = (val) => {
-        this.state.publicAddress = val ; 
+        this.setState({publicAddress: val});
     }
 
     isValid = () => {
@@ -74,22 +75,26 @@ class WalletInputs extends Component {
                     style={[Theme.TextInput.textInputStyle, this.state.usernameError ?  Theme.Errors.errorBorder : null]}  />
                 {this.state.usernameError && ( <Text style={Theme.Errors.errorText}>Please enter a valid username</Text> )}
 
-                <TextInput  placeholder={"Pin"} 
-                            onChangeText={this.onPin} 
-                            returnKeyType="done"
-                            returnKeyLabel="Done"
-                            keyboardType="numeric"
-                            placeholderTextColor="#ababab"
-                            style={[Theme.TextInput.textInputStyle , this.state.pinError ? Theme.Errors.errorBorder : null]}  />
-                {this.state.pinError && ( <Text style={Theme.Errors.errorText}>Please enter a valid Pin</Text> )}
-
                 <TextInput  placeholder={"Public Address"} 
                             onChangeText={this.onPublicAddress} 
                             placeholderTextColor="#ababab"
                             returnKeyType="done"
                             returnKeyLabel="Done"
-                            style={[Theme.TextInput.textInputStyle, this.state.publicAddressError ? Theme.Errors.errorBorder : null]}  />
+                            style={[Theme.TextInput.textInputStyle,
+                                     this.state.publicAddressError ? Theme.Errors.errorBorder : null]}  />
                 {this.state.publicAddressError && ( <Text style={Theme.Errors.errorText}>Please enter a valid public address</Text> )}
+
+                <Text style={{marginTop:10}}></Text> 
+                <SmoothPinCodeInput
+                    codeLength={6}
+                    cellSize={42}
+                    cellStyleFocused={{  borderColor: '#A9A9A9' }}
+                    mask="*"
+                    password
+                    value={this.state.pin}
+                    onTextChange={this.onPin}
+                />
+                {this.state.pinError && ( <Text style={Theme.Errors.errorText}>Please enter a valid Pin</Text> )}
 
                 <TouchableButton
                     TouchableStyles={[Theme.Button.btnPink ,  {marginTop: 20}]}

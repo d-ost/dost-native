@@ -5,5 +5,6 @@
 import {AppRegistry} from 'react-native';
 import AppContainer from './AppContainer';
 import {name as appName} from './app.json';
+import './shim.js'
 
 AppRegistry.registerComponent(appName, () => AppContainer);

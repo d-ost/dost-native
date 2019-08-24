@@ -5,6 +5,8 @@ import TouchableButton from '../theme/components/TouchableButton';
 
 import Theme from '../theme/styles';
 
+import Web3 from 'web3';
+
 class Landing extends Component {
 
     static navigationOptions = ({ navigation, navigationOptions }) => {
@@ -15,7 +17,17 @@ class Landing extends Component {
       };
 
     constructor(props){
-        super(props); 
+        super(props);
+
+        console.log("In class web3", Web3);
+
+      const web3 = new Web3(
+        new Web3.providers.HttpProvider('https://mainnet.infura.io/')
+      );
+
+      console.log("In web3", web3);
+
+      web3.eth.getBlock('latest').then(console.log)
     }
 
     onWalletCreate = () => {
@@ -25,7 +37,7 @@ class Landing extends Component {
     onWalletRecovery = () => {
         this.props.navigation.push('RecoverWallet');
     }
- 
+
     render (){
         return (
             <View style={{flex:1}}>
@@ -43,7 +55,7 @@ class Landing extends Component {
                         text="Recover Wallet"
                         onPress={this.onWalletRecovery}
                     />
-                </View>  
+                </View>
                 <Text style={{textAlign: "center" , fontSize: 10, color: Theme.Colors.greyLite}}>
                     App is under development, please use at your own risk.</Text>
             </View>
@@ -52,4 +64,4 @@ class Landing extends Component {
 
 }
 
-export default Landing ; 
+export default Landing ;
