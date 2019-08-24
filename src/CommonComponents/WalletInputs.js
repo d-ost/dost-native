@@ -82,7 +82,7 @@ class WalletInputs extends Component {
                     style={[Theme.TextInput.textInputStyle, this.state.usernameError ?  Theme.Errors.errorBorder : null]}  />
                 {this.state.usernameError && ( <Text style={Theme.Errors.errorText}>Please enter a valid username</Text> )}
 
-                <TextInput  placeholder={"Public Address"} 
+                <TextInput  placeholder={"Safe Wallet Address"} 
                             onChangeText={this.onPublicAddress} 
                             placeholderTextColor="#ababab"
                             returnKeyType="done"
