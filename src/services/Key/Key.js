@@ -1,5 +1,6 @@
 const web3utils = require('web3-utils');
 const Scrypt = require('scrypt');
+const crypto = require('crypto');
 
 class Key {
   constructor(userAddress, pin) {
@@ -22,18 +23,51 @@ class Key {
     assert(this.salt !== '');
 
 
-    this.encryptionKey = Key.calculateEncryptionKey(this.userSecret, this.salt);
-    assert(typeof this.encryptionKey === 'string');
-    assert(this.encryptionKey !== '');
+    this.encryptionKeySeed = Key.calculateEncryptionKeySeed(this.userSecret, this.salt);
+    assert(typeof this.encryptionKeySeed === 'string');
+    assert(this.encryptionKeySeed !== '');
+
+    const keys = crypto.generateKeyPairSync(
+      'rsa', {
+        modulusLength: 4096,
+        publicKeyEncoding: {
+          type: 'spki',
+        },
+        privateKeyEncoding: {
+          type: 'pkcs8',
+          cipher: 'aes-256-cbc',
+          passphrase: this.pin,
+        },
+      },
+    );
+    this.publicKey = keys.publicKey;
+    this.privateKey = keys.privateKey;
   }
 
-  pem() {}
+  pem() {
+    return this.privateKey.export({
+      format: 'pem',
+    });
+  }
 
-  pemPass() {}
+  pemPass() {
+    return this.pin;
+  }
 
-  encrypt(data) {}
+  encrypt(data) {
+    const cipher = crypto.createCipheriv('aes-256-cbc', this.privateKey);
+    let encrypted = cipher.update(data);
+    encrypted = Buffer.concat([encrypted, cipher.final()]);
+    return encrypted.toString('hex');
+  }
 
-  decrypt(encryptedData) {}
+  decrypt(encryptedData) {
+    const decipher = crypto.createDecipheriv('aes-256-cbc', this.privateKey);
+    let decrypted = decipher.update(Buffer.from(encryptedData, 'hex'));
+    decrypted = Buffer.concat([decrypted, decipher.final()]);
+
+    return decrypted.toString();
+  }
 
   static calculateUserSecret(userAddress, pin) {
     assert(typeof userAddress === 'string');
@@ -54,7 +88,7 @@ class Key {
     return web3utils.randomHex(32);
   }
 
-  static calculateEncryptionKey(userSecret, salt) {
+  static calculateEncryptionKeySeed(userSecret, salt) {
     assert(typeof userSecret === 'string');
     assert(userSecret !== '');
 
