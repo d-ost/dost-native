@@ -28,19 +28,7 @@ describe('Key::constructor', async () => {
     );
 
     assert.isOk(
-      key.encryptionKeySeed,
-    );
-
-    assert.isOk(
-      key.encryptionKeySeed,
-    );
-
-    assert.isOk(
-      key.publicKey,
-    );
-
-    assert.isOk(
-      key.privateKey,
+      key.encryptionKey,
     );
   });
 
@@ -62,18 +50,8 @@ describe('Key::constructor', async () => {
     );
 
     assert.notStrictEqual(
-      key1.encryptionKeySeed,
-      key2.encryptionKeySeed,
-    );
-
-    assert.notStrictEqual(
-      key1.publicKey,
-      key2.publicKey,
-    );
-
-    assert.notStrictEqual(
-      key1.privateKey,
-      key2.privateKey,
+      key1.encryptionKey,
+      key2.encryptionKey,
     );
   });
 });

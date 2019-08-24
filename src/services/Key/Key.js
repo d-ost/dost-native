@@ -23,58 +23,40 @@ class Key {
     assert(typeof this.salt === 'string');
     assert(this.salt !== '');
 
-    this.encryptionKeySeed = Key.calculateEncryptionKeySeed(this.userSecret, this.salt);
-    assert(typeof this.encryptionKeySeed === 'string');
-    assert(this.encryptionKeySeed !== '');
+    this.encryptionKey = Key.calculateEncryptionKey(this.userSecret, this.salt);
+    assert(this.encryptionKey.length !== 0);
 
-    const keys = crypto.generateKeyPairSync(
-      'rsa', {
-        modulusLength: 4096,
-        publicKeyEncoding: {
-          type: 'spki',
-          format: 'pem',
-        },
-        privateKeyEncoding: {
-          type: 'pkcs8',
-          cipher: 'aes-256-cbc',
-          format: 'pem',
-          passphrase: this.pin,
-        },
+    this.ipnsPemKey = crypto.generateKeyPairSync('rsa', {
+      modulusLength: 4096,
+      publicKeyEncoding: {
+        type: 'spki',
+        format: 'pem',
       },
-    );
-
-    assert(typeof keys.publicKey === 'string');
-    assert(keys.publicKey !== '');
-    this.publicKey = keys.publicKey;
-
-    assert(typeof keys.privateKey === 'string');
-    assert(keys.privateKey !== '');
-    this.privateKey = keys.privateKey;
+      privateKeyEncoding: {
+        type: 'pkcs8',
+        format: 'pem',
+      },
+    });
   }
 
   pem() {
     assert(typeof this.privateKey === 'string');
     assert(this.privateKey !== '');
 
-    return this.privateKey;
-  }
-
-  pemPass() {
-    assert(typeof this.pin === 'string');
-    assert(this.pin !== '');
-
-    return this.pin;
+    return this.ipnsPemKey.privateKey;
   }
 
   encrypt(data) {
-    const cipher = crypto.createCipheriv('aes-256-cbc', this.privateKey);
+    const cipher = crypto.createCipheriv('aes-256-cbc', this.encryptionKey, Buffer.alloc(16, 0));
     let encrypted = cipher.update(data);
     encrypted = Buffer.concat([encrypted, cipher.final()]);
     return encrypted.toString('hex');
   }
 
   decrypt(encryptedData) {
-    const decipher = crypto.createDecipheriv('aes-256-cbc', this.privateKey);
+    const iv = Buffer.from(this.pin);
+
+    const decipher = crypto.createDecipheriv('aes-256-cbc', this.encryptionKey, Buffer.alloc(16, 0));
     let decrypted = decipher.update(Buffer.from(encryptedData, 'hex'));
     decrypted = Buffer.concat([decrypted, decipher.final()]);
 
@@ -100,14 +82,14 @@ class Key {
     return web3utils.randomHex(32);
   }
 
-  static calculateEncryptionKeySeed(userSecret, salt) {
+  static calculateEncryptionKey(userSecret, salt) {
     assert(typeof userSecret === 'string');
     assert(userSecret !== '');
 
     assert(typeof salt === 'string');
     assert(salt !== '');
 
-    return Scrypt.hashSync(userSecret, { N: 16384, r: 8, p: 1 }, 64, salt).toString();
+    return Scrypt.hashSync(userSecret, { N: 16384, r: 8, p: 1 }, 32, salt);
   }
 }
 
