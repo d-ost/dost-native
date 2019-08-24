@@ -1,4 +1,5 @@
 const assert = require('assert');
+const crypto = require('crypto');
 
 const Atlas = require('./Atlas');
 
@@ -23,21 +24,23 @@ class AtlasFile {
     );
 
     this.ipfsPath = '';
+  }
 
-    this.keyName = 'atlasEncryptionKey';
+  async setupKey() {
+    const response = await this.ipfsClient.key.gen(crypto.randomBytes(20).toString(), {
+      type: 'rsa',
+      size: 2048,
+    });
 
-    this.ipfsClient.key.import(
-      this.keyName,
-      key.pem(),
-      key.pemPass(),
-    );
+    this.ipfsKeyName = response.name;
+    this.ipfsKeyId = response.id;
   }
 
   async publish() {
-    if (this.ipfsPath !== '') {
-      assert(this.atlas.index !== 0);
-      assert(this.atlas.parentIpfsPath !== '');
+    assert(this.ipfsKeyName !== '');
+    assert(this.ipfsKeyId !== '');
 
+    if (this.ipfsPath !== '') {
       this.atlas.index += 1;
       this.atlas.parentIpfsPath = this.ipfsPath;
     }
@@ -50,14 +53,7 @@ class AtlasFile {
 
     this.ipfsPath = `/ipfs/${ipfsResult[0].hash}`;
 
-    const ipnsResult = await this.ipfsClient.name.publish(
-      this.ipfsPath,
-      { key: this.keyName },
-    );
-
-    assert(ipnsResult.value === this.ipfsPath);
-
-    return `/ipns/${ipnsResult.name}`;
+    return this.ipfsPath;
   }
 
   static async createFromFile(
@@ -65,13 +61,12 @@ class AtlasFile {
     key,
     ipfsPath,
   ) {
-    this.ipfsClient = ipfsClient;
-    this.key = key;
-    this.ipfsPath = ipfsPath;
+    const ipfsResponse = await ipfsClient.get(ipfsPath);
 
-    const ipfsResponse = await this.ipfsClient.get(this.ipfsPath);
+    assert(Array.isArray(ipfsResponse));
+    assert(ipfsResponse.length === 1);
 
-    const encryptedContent = ipfsResponse.content;
+    const encryptedContent = ipfsResponse[0].content;
 
     assert(Buffer.isBuffer(encryptedContent));
     assert(encryptedContent.length !== 0);
@@ -83,22 +78,21 @@ class AtlasFile {
 
     const atlas = JSON.parse(content.toString());
 
-    this.atlas = new Atlas(
-      atlas.parentIpfsPath,
-      atlas.index,
+    const atlasFile = new AtlasFile(
+      ipfsClient,
+      key,
       atlas.safeAddress,
       atlas.recoveryModuleAddress,
       atlas.recoveryPrivateKey,
-      atlas.shares,
     );
 
-    this.keyName = 'atlasEncryptionKey';
+    atlasFile.atlas.parentIpfsPath = atlas.parentIpfsPath;
+    atlasFile.atlas.index = atlas.index;
+    atlasFile.atlas.shares = atlas.shares;
 
-    this.ipfsClient.key.import(
-      this.keyName,
-      key.pem(),
-      key.pemPass(),
-    );
+    atlasFile.ipfsPath = ipfsPath;
+
+    return atlasFile;
   }
 
   updateFriendShamirSecret(userAddress, secret) {
@@ -108,7 +102,7 @@ class AtlasFile {
     assert(typeof secret === 'string');
     assert(secret !== '');
 
-    this.atlas.shares.userAddress = secret;
+    this.atlas.shares[userAddress] = secret;
   }
 }
 

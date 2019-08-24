@@ -18,14 +18,13 @@ describe('Key::encryption', async () => {
 
     const key = new Key(userAddress, pin);
 
-    const data = 'something to encrypt';
+    const data = Buffer.from('something to encrypt');
 
     const encryptedData = key.encrypt(data);
     const decryptedData = key.decrypt(encryptedData);
 
-    assert.strictEqual(
-      data,
-      decryptedData,
+    assert.isOk(
+      Buffer.compare(data, decryptedData) === 0,
     );
   });
 
@@ -36,14 +35,13 @@ describe('Key::encryption', async () => {
 
       const key = new Key(userAddress, pin);
 
-      const data = crypto.randomBytes(getRandomIntInclusive(5, 200)).toString();
+      const data = crypto.randomBytes(getRandomIntInclusive(5, 200));
 
       const encryptedData = key.encrypt(data);
       const decryptedData = key.decrypt(encryptedData);
 
-      assert.strictEqual(
-        data,
-        decryptedData,
+      assert.isOk(
+        Buffer.compare(data, decryptedData) === 0,
       );
     }
   });

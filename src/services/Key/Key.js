@@ -26,41 +26,39 @@ class Key {
     this.encryptionKey = Key.calculateEncryptionKey(this.userSecret, this.salt);
     assert(this.encryptionKey.length !== 0);
 
-    this.ipnsPemKey = crypto.generateKeyPairSync('rsa', {
-      modulusLength: 4096,
-      publicKeyEncoding: {
-        type: 'spki',
-        format: 'pem',
-      },
-      privateKeyEncoding: {
-        type: 'pkcs8',
-        format: 'pem',
-      },
-    });
+    // this.ipnsPemKey = crypto.generateKeyPairSync('rsa', {
+    //   modulusLength: 4096,
+    //   publicKeyEncoding: {
+    //     type: 'spki',
+    //     format: 'pem',
+    //   },
+    //   privateKeyEncoding: {
+    //     type: 'pkcs8',
+    //     format: 'pem',
+    //   },
+    // });
   }
 
-  pem() {
-    assert(typeof this.privateKey === 'string');
-    assert(this.privateKey !== '');
+  // pem() {
+  //   assert(typeof this.ipnsPemKey.privateKey === 'string');
+  //   assert(this.ipnsPemKey.privateKey !== '');
 
-    return this.ipnsPemKey.privateKey;
-  }
+  //   return this.ipnsPemKey.privateKey;
+  // }
 
   encrypt(data) {
     const cipher = crypto.createCipheriv('aes-256-cbc', this.encryptionKey, Buffer.alloc(16, 0));
     let encrypted = cipher.update(data);
     encrypted = Buffer.concat([encrypted, cipher.final()]);
-    return encrypted.toString('hex');
+    return encrypted;
   }
 
   decrypt(encryptedData) {
-    const iv = Buffer.from(this.pin);
-
+    assert(Buffer.isBuffer(encryptedData));
     const decipher = crypto.createDecipheriv('aes-256-cbc', this.encryptionKey, Buffer.alloc(16, 0));
     let decrypted = decipher.update(Buffer.from(encryptedData, 'hex'));
     decrypted = Buffer.concat([decrypted, decipher.final()]);
-
-    return decrypted.toString();
+    return decrypted;
   }
 
   static calculateUserSecret(userAddress, pin) {
