@@ -85,7 +85,7 @@ describe('AccessFile::recoverFromShares', async () => {
   });
 
   it('fuzzy test', async () => {
-    for (let i = 0; i < 500; i += 1) {
+    for (let i = 0; i < 50; i += 1) {
       const shareCount = getRandomIntInclusive(2, 10);
       const threshold = getRandomIntInclusive(1, shareCount);
 

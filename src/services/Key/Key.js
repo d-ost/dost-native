@@ -1,27 +1,68 @@
-class Key {
-  // this.username
-  // this.pin
-  // this.salt
-  // this.key
+const web3utils = require('web3-utils');
+const Scrypt = require('scrypt');
 
-  constructor(username, pin) {
-    this.username = username;
+class Key {
+  constructor(userAddress, pin) {
+    assert(typeof userAddress === 'string');
+    assert(userAddress !== '');
+
+    this.userAddress = userAddress;
+
+    assert(typeof pin === 'string');
+    assert(pin !== '');
+
     this.pin = pin;
 
-    const userSecret = Key._generateUserSecret(this.username, this.pin);
+    this.userSecret = Key.calculateUserSecret(this.userAddress, this.pin);
+    assert(typeof this.userSecret === 'string');
+    assert(this.userSecret !== '');
 
-    this.salt = Key._generateSalt();
+    this.salt = Key.generateSalt();
+    assert(typeof this.salt === 'string');
+    assert(this.salt !== '');
 
-    this.key = Key._generateKey(userSecret, this.salt);
+
+    this.encryptionKey = Key.calculateEncryptionKey(this.userSecret, this.salt);
+    assert(typeof this.encryptionKey === 'string');
+    assert(this.encryptionKey !== '');
   }
+
+  pem() {}
+
+  pemPass() {}
 
   encrypt(data) {}
 
-  static _generateUserSecret(username, pin) {}
+  decrypt(encryptedData) {}
 
-  static _generateSalt() {}
+  static calculateUserSecret(userAddress, pin) {
+    assert(typeof userAddress === 'string');
+    assert(userAddress !== '');
 
-  static _generateKey(userSecret, salt) {}
+    assert(typeof pin === 'string')
+      .assert(pin !== '');
+
+    return web3utils.sha3(
+      JSON.stringify({
+        userAddress,
+        pin,
+      }),
+    );
+  }
+
+  static generateSalt() {
+    return web3utils.randomHex(32);
+  }
+
+  static calculateEncryptionKey(userSecret, salt) {
+    assert(typeof userSecret === 'string');
+    assert(userSecret !== '');
+
+    assert(typeof salt === 'string');
+    assert(salt !== '');
+
+    return Scrypt.hash(this.userSecret, { N: 16384, r: 8, p: 1 }, 64, salt).toString();
+  }
 }
 
 module.exports = Key;
