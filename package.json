@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
-    "test": "jest"
+    "test:app": "jest",
+    "test:js": "mocha --timeout 20000 ./test/services/**/*.test.js"
   },
   "repository": {
     "type": "git",
@@ -24,6 +25,7 @@
     "assert": "^2.0.0",
     "bignumber.js": "8.1.1",
     "bn.js": "^5.0.0",
+    "crypto": "^1.0.1",
     "eslint": "^6.2.1",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-plugin-import": "^2.18.2",
@@ -52,9 +54,13 @@
     "@babel/core": "7.5.5",
     "@babel/runtime": "7.5.5",
     "babel-jest": "24.9.0",
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
     "jest": "24.9.0",
     "metro-react-native-babel-preset": "0.56.0",
-    "react-test-renderer": "16.8.3"
+    "mocha": "^6.2.0",
+    "react-test-renderer": "16.8.3",
+    "shamirs-secret-sharing": "^1.0.1"
   },
   "jest": {
     "preset": "react-native"
