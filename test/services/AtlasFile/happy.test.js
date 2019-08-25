@@ -4,9 +4,11 @@ const IpfsClient = require('ipfs-http-client');
 const AtlasFile = require('../../../src/services/Atlas/AtlasFile');
 const Key = require('../../../src/services/Key/Key');
 
+
 describe('AtlasFile::HappyPath', async () => {
   it('', async () => {
     const ipfsClient = new IpfsClient('/ip4/127.0.0.1/tcp/5001');
+    // const ipfsClient = new IpfsClient('https://ipfs.ethberlin.dappnode.net');
 
     const username = 'username';
     const pin = '123456';

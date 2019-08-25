@@ -1,6 +1,5 @@
 const assert = require('assert');
 const crypto = require('crypto');
-const Scrypt = require('scrypt');
 const web3utils = require('web3-utils');
 
 class Key {
@@ -68,7 +67,7 @@ class Key {
     assert(typeof salt === 'string');
     assert(salt !== '');
 
-    return Scrypt.hashSync(userSecret, { N: 16384, r: 8, p: 1 }, 32, salt);
+    return crypto.scryptSync(userSecret, salt, 32, { N: 16384, r: 8, p: 1 });
   }
 }
 
