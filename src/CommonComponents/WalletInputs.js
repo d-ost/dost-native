@@ -23,6 +23,12 @@ class WalletInputs extends Component {
         }
     }
 
+    onUserNameFocus = () => {
+        if(this.props.searchUser){
+            this.props.navigation.push("Userlist" ,  { onUsername : this.onUserNameChange }); 
+        }
+    }
+
     onUserNameChange = (val) => {
         this.setState({username: val});
     }
@@ -64,9 +70,10 @@ class WalletInputs extends Component {
 
     render (){
         return (
-            <View style={{flex:1 , marginTop: 20,  paddingHorizontal:50}}>
+            <View style={{flex:1 , marginTop: 20,  paddingHorizontal:30}}>
 
                 <TextInput placeholder={"Username"} 
+                    onFocus={this.onUserNameFocus}
                     textContentType="none"
                     returnKeyType="done"
                     returnKeyLabel="Done"
@@ -75,7 +82,7 @@ class WalletInputs extends Component {
                     style={[Theme.TextInput.textInputStyle, this.state.usernameError ?  Theme.Errors.errorBorder : null]}  />
                 {this.state.usernameError && ( <Text style={Theme.Errors.errorText}>Please enter a valid username</Text> )}
 
-                <TextInput  placeholder={"Public Address"} 
+                <TextInput  placeholder={"Safe Wallet Address"} 
                             onChangeText={this.onPublicAddress} 
                             placeholderTextColor="#ababab"
                             returnKeyType="done"
@@ -87,7 +94,7 @@ class WalletInputs extends Component {
                 <Text style={{marginTop:10}}></Text> 
                 <SmoothPinCodeInput
                     codeLength={6}
-                    cellSize={42}
+                    cellSize={50}
                     cellStyleFocused={{  borderColor: '#A9A9A9' }}
                     mask="*"
                     password
