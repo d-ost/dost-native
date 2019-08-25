@@ -2,6 +2,7 @@ const assert = require('assert');
 const crypto = require('crypto');
 
 const AccessFile = require('../../../src/services/Access/AccessFile');
+const Key = require('../../../src/services/Key/Key');
 
 function getRandomIntInclusive(_min, _max) {
   const min = Math.ceil(_min);
@@ -13,26 +14,25 @@ function getRandomIntInclusive(_min, _max) {
 
 describe('AccessFile::recoverFromShares', async () => {
   it('1 out of 1', async () => {
-    const atlasIpnsAddress = 'atlasIpnsAddressA';
-    const salt = 'saltA';
+    const username = 'username';
+    const pin = '123456';
 
-    const accessFile = new AccessFile(atlasIpnsAddress, salt);
+    const key = new Key(username, pin);
+
+    const { salt } = key;
+
+    const accessFile = new AccessFile(salt);
 
     const shareCount = 1;
     const threshold = 1;
-    const shares = accessFile.createShares(shareCount, threshold);
+    const shares = accessFile.createShares(key, shareCount, threshold);
 
     assert.strictEqual(
       shares.length,
       1,
     );
 
-    const recovered = AccessFile.recoverFromShares(shares);
-
-    assert.strictEqual(
-      recovered.atlasIpnsAddress,
-      atlasIpnsAddress,
-    );
+    const recovered = AccessFile.recoverFromShares(key, shares);
 
     assert.strictEqual(
       recovered.salt,
@@ -41,14 +41,18 @@ describe('AccessFile::recoverFromShares', async () => {
   });
 
   it('1 out of 2', async () => {
-    const atlasIpnsAddress = 'atlasIpnsAddressA';
-    const salt = 'saltA';
+    const username = 'username';
+    const pin = '123456';
 
-    const accessFile = new AccessFile(atlasIpnsAddress, salt);
+    const key = new Key(username, pin);
+
+    const { salt } = key;
+
+    const accessFile = new AccessFile(salt);
 
     const shareCount = 2;
     const threshold = 1;
-    const shares = accessFile.createShares(shareCount, threshold);
+    const shares = accessFile.createShares(key, shareCount, threshold);
 
     assert.strictEqual(
       shares.length,
@@ -56,12 +60,7 @@ describe('AccessFile::recoverFromShares', async () => {
     );
 
     {
-      const recovered = AccessFile.recoverFromShares(shares.slice(0, 1));
-
-      assert.strictEqual(
-        recovered.atlasIpnsAddress,
-        atlasIpnsAddress,
-      );
+      const recovered = AccessFile.recoverFromShares(key, shares.slice(0, 1));
 
       assert.strictEqual(
         recovered.salt,
@@ -70,12 +69,7 @@ describe('AccessFile::recoverFromShares', async () => {
     }
 
     {
-      const recovered = AccessFile.recoverFromShares(shares.slice(1));
-
-      assert.strictEqual(
-        recovered.atlasIpnsAddress,
-        atlasIpnsAddress,
-      );
+      const recovered = AccessFile.recoverFromShares(key, shares.slice(1));
 
       assert.strictEqual(
         recovered.salt,
@@ -89,12 +83,15 @@ describe('AccessFile::recoverFromShares', async () => {
       const shareCount = getRandomIntInclusive(2, 10);
       const threshold = getRandomIntInclusive(1, shareCount);
 
-      const atlasIpnsAddress = crypto.randomBytes(getRandomIntInclusive(5, 100)).toString();
-      const salt = crypto.randomBytes(getRandomIntInclusive(5, 100)).toString().toString();
+      const username = crypto.randomBytes(10).toString();
+      const pin = crypto.randomBytes(10).toString();
 
-      const accessFile = new AccessFile(atlasIpnsAddress, salt);
+      const key = new Key(username, pin);
+      const { salt } = key;
 
-      const shares = accessFile.createShares(shareCount, threshold);
+      const accessFile = new AccessFile(salt);
+
+      const shares = accessFile.createShares(key, shareCount, threshold);
 
       assert(
         Array.isArray(shares),
@@ -109,12 +106,7 @@ describe('AccessFile::recoverFromShares', async () => {
 
       const knownShareAmount = getRandomIntInclusive(threshold, shareCount);
 
-      const recovered = AccessFile.recoverFromShares(shares.slice(0, knownShareAmount));
-
-      assert.strictEqual(
-        recovered.atlasIpnsAddress,
-        atlasIpnsAddress,
-      );
+      const recovered = AccessFile.recoverFromShares(key, shares.slice(0, knownShareAmount));
 
       assert.strictEqual(
         recovered.salt,

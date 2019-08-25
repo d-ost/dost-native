@@ -8,11 +8,12 @@ describe('AtlasFile::HappyPath', async () => {
   it('', async () => {
     const ipfsClient = new IpfsClient('/ip4/127.0.0.1/tcp/5001');
 
-    const userAddress = 'userAddress';
+    const username = 'username';
     const pin = '123456';
 
-    const key = new Key(userAddress, pin);
+    const key = new Key(username, pin);
 
+    const burnerPrivateKey = 'burnerKey';
     const safeAddress = 'safeAddress';
     const recoveryModuleAddress = 'recoveryModuleAddress';
     const recoveryPrivateKey = 'recoveryPrivateKey';
@@ -20,6 +21,7 @@ describe('AtlasFile::HappyPath', async () => {
     const atlasFile1 = new AtlasFile(
       ipfsClient,
       key,
+      burnerPrivateKey,
       safeAddress,
       recoveryModuleAddress,
       recoveryPrivateKey,
@@ -51,6 +53,11 @@ describe('AtlasFile::HappyPath', async () => {
     );
 
     assert.strictEqual(
+      atlasFile1.atlas.burnerPrivateKey,
+      burnerPrivateKey,
+    );
+
+    assert.strictEqual(
       atlasFile1.atlas.safeAddress,
       safeAddress,
     );
@@ -70,8 +77,6 @@ describe('AtlasFile::HappyPath', async () => {
       {},
     );
 
-    await atlasFile1.setupKey();
-
     await atlasFile1.publish();
 
     let atlasFile2 = await AtlasFile.createFromFile(
@@ -86,8 +91,8 @@ describe('AtlasFile::HappyPath', async () => {
     );
 
     assert.strictEqual(
-      atlasFile2.atlas.safeAddress,
-      atlasFile1.atlas.safeAddress,
+      atlasFile2.atlas.burnerPrivateKey,
+      atlasFile1.atlas.burnerPrivateKey,
     );
 
     assert.strictEqual(
@@ -134,8 +139,8 @@ describe('AtlasFile::HappyPath', async () => {
     );
 
     assert.strictEqual(
-      atlasFile2.atlas.safeAddress,
-      atlasFile1.atlas.safeAddress,
+      atlasFile2.atlas.burnerPrivateKey,
+      atlasFile1.atlas.burnerPrivateKey,
     );
 
     assert.strictEqual(
@@ -158,7 +163,7 @@ describe('AtlasFile::HappyPath', async () => {
       atlasFile1.atlas.shares,
     );
 
-    atlasFile1.updateFriendShamirSecret(
+    atlasFile1.updateContactShamirSecret(
       'Alice', 'AliceSecret',
     );
 
@@ -191,8 +196,8 @@ describe('AtlasFile::HappyPath', async () => {
     );
 
     assert.strictEqual(
-      atlasFile2.atlas.safeAddress,
-      atlasFile1.atlas.safeAddress,
+      atlasFile2.atlas.burnerPrivateKey,
+      atlasFile1.atlas.burnerPrivateKey,
     );
 
     assert.strictEqual(

@@ -1,5 +1,4 @@
 const assert = require('assert');
-const crypto = require('crypto');
 
 const Atlas = require('./Atlas');
 
@@ -7,6 +6,7 @@ class AtlasFile {
   constructor(
     ipfsClient,
     key,
+    burnerPrivateKey,
     safeAddress,
     recoveryModuleAddress,
     recoveryPrivateKey,
@@ -17,29 +17,18 @@ class AtlasFile {
     this.atlas = new Atlas(
       '',
       0,
+      burnerPrivateKey,
       safeAddress,
       recoveryModuleAddress,
       recoveryPrivateKey,
       {},
+      [],
     );
 
     this.ipfsPath = '';
   }
 
-  async setupKey() {
-    const response = await this.ipfsClient.key.gen(crypto.randomBytes(20).toString(), {
-      type: 'rsa',
-      size: 2048,
-    });
-
-    this.ipfsKeyName = response.name;
-    this.ipfsKeyId = response.id;
-  }
-
   async publish() {
-    assert(this.ipfsKeyName !== '');
-    assert(this.ipfsKeyId !== '');
-
     if (this.ipfsPath !== '') {
       this.atlas.index += 1;
       this.atlas.parentIpfsPath = this.ipfsPath;
@@ -81,6 +70,7 @@ class AtlasFile {
     const atlasFile = new AtlasFile(
       ipfsClient,
       key,
+      atlas.burnerPrivateKey,
       atlas.safeAddress,
       atlas.recoveryModuleAddress,
       atlas.recoveryPrivateKey,
@@ -89,20 +79,29 @@ class AtlasFile {
     atlasFile.atlas.parentIpfsPath = atlas.parentIpfsPath;
     atlasFile.atlas.index = atlas.index;
     atlasFile.atlas.shares = atlas.shares;
+    atlasFile.atlas.contacts = atlas.contacts;
 
     atlasFile.ipfsPath = ipfsPath;
 
     return atlasFile;
   }
 
-  updateFriendShamirSecret(userAddress, secret) {
-    assert(typeof userAddress === 'string');
-    assert(userAddress !== '');
+  updateContactShamirSecret(username, secret) {
+    assert(typeof username === 'string');
+    assert(username !== '');
 
     assert(typeof secret === 'string');
     assert(secret !== '');
 
-    this.atlas.shares[userAddress] = secret;
+    this.atlas.shares[username] = secret;
+  }
+
+  addContact(username, safeL1Address, alias) {
+    this.atlas.contacts.push({
+      username,
+      safeL1Address,
+      alias,
+    });
   }
 }
 
