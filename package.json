@@ -54,7 +54,7 @@
     "ipfs-http-client": "^33.1.1",
     "jest": "24.9.0",
     "js-ipfs": "0.0.301",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "metro-react-native-babel-preset": "0.56.0",
     "mocha": "^6.2.0",
     "native-base": "^2.13.5",
